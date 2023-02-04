@@ -1,88 +1,51 @@
-$ASDF_HOME = "${HOME}/.asdf"
+$ASDF_HOME = "${HOME}\.asdf"
+$ASDF_SCRIPTS = "${ASDF_HOME}\scripts"
+$ASDF_CLASSES = "${ASDF_HOME}\classes"
+
+$PLUGINS_NAMES = (dir "~\.asdf\plugins").Name
+
+. $ASDF_CLASSES/PluginsNames.ps1
+. $ASDF_CLASSES/LibNames.ps1
 
 function asdf() {
     param (
-        
-        [switch]$v,
-        
-        [switch]$version,
-
         [Alias('p')]
-        [ValidateSet('java','maven', 'quarkus')]
+        [ValidateSet([PluginsNames])]
         [string]$plugin,
-        
-        [Alias('i')]
-        [string[]]$install,
 
-        [Alias('l')]
-        [string]$local,
+        [Alias('i')]
+        [ValidateSet([LibNames])]
+        [string]$version,
 
         [Alias('g')]
-        [string]$global
+        [switch]$global,
 
+        [Alias('t')]
+        [switch]$terminal
     )
-
-    if ($v) {
-        echo "--- debug params ---"
-        if ($plugin) { echo "plugin: ${plugin}" }
-        if ($install) { echo "install: ${install}" }
-        if ($local) { echo "local: ${local}" }
-        if ($global) { echo "global: ${global}" }
-        echo ""
-    }
-
-    if ($version) {
-        echo "asdf 1.0.0"
+    
+    if (!$plugin) {
+        .$ASDF_SCRIPTS\version.ps1
         return
-    }
-
-    if ($plugin) {
-
-        if ($install) {
-            foreach ($lib in $install) {
-                .$ASDF_HOME/plugins/$plugin/install.ps1
-            }
-            return
-        } 
-        
-        if ($local) {
-            .$ASDF_HOME/plugins/$plugin/local.ps1
-            return
-        }
-
-        if ($global) {
-            .$ASDF_HOME/plugins/$plugin/global.ps1
-            return
-        }
-        
-        ."${ASDF_HOME}/plugins/list.ps1"
-        
+    } elseif ($plugin -eq "version") {
+        .$ASDF_SCRIPTS\version.ps1
+        return
+    } elseif ($plugin -eq "list") {
+        .$ASDF_SCRIPTS\plugins\list.ps1
+        return
     } else {
-        echo "-plugin is required"
-    }
-
-}
-
-function java() {
-    if ($env:JAVA_HOME) {
-        if (test-path $env:JAVA_HOME) {
-            ."${env:JAVA_HOME}\bin\java.exe" $args 
+        if (!$version) {
+            .$ASDF_SCRIPTS\versions\list.ps1
+        } elseif ($version -eq "list") {
+            .$ASDF_SCRIPTS\versions\list.ps1
+        } else {
+            .$ASDF_SCRIPTS\versions\install.ps1
+            .$ASDF_SCRIPTS\versions\set-env.ps1
         }
     }
-}
 
-function mvn() {
-    if ($env:MVN_HOME) {
-        if (test-path $env:MVN_HOME) {
-            ."${env:MVN_HOME}\bin\mvn.cmd" $args 
-        }
-    }
-}
+} 
 
-function quarkus() {
-    if ($env:QUARKUS_JAR) {
-        if (test-path $env:QUARKUS_JAR) {
-            ."${env:JAVA_HOME}\bin\java.exe" -jar "${env:QUARKUS_JAR}" $args 
-        }
-    }
+foreach ($p in $PLUGINS_NAMES) {
+    . "${ASDF_HOME}\plugins\${p}\exec.ps1"
 }
