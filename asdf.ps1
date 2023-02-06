@@ -25,10 +25,13 @@ function asdf() {
     )
     
     if (!$plugin) {
-        .$ASDF_SCRIPTS\version.ps1
+        .$ASDF_SCRIPTS\banner.ps1
         return
     } elseif ($plugin -eq "version") {
         .$ASDF_SCRIPTS\version.ps1
+        return
+    } elseif ($plugin -eq "update") {
+        .$ASDF_SCRIPTS\update.ps1
         return
     } elseif ($plugin -eq "list") {
         .$ASDF_SCRIPTS\plugins\list.ps1

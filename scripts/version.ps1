@@ -1,3 +1,3 @@
-.$ASDF_SCRIPTS/plugins/list.ps1
-echo ""
-echo "asdf v1.0.0"
+# .$ASDF_SCRIPTS/plugins/list.ps1
+# echo ""
+cat ${ASDF_HOME}/version.txt
