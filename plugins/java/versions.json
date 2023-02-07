@@ -1,11 +1,13 @@
 [
-    
     {
-        "name": "openjdk-8.0_42-b03",
-        "url": "https://download.java.net/openjdk/jdk8u42/ri/openjdk-8u42-b03-windows-i586-14_jul_2022.zip" 
+        "name": "ojdkbuild-8.0.332-1.b09",
+        "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.332-1.b09/java-1.8.0-openjdk-1.8.0.332-1.b09.ojdkbuild.windows.x86_64.zip" 
     },{
-        "name": "openjdk-8.0_331-b09",
-        "url": "https://sdlc-esd.oracle.com/ESD6/JSCDL/jdk/8u361-b09/0ae14417abb444ebb02b9815e2103550/jre-8u361-windows-x64.exe?GroupName=JSC&FilePath=/ESD6/JSCDL/jdk/8u361-b09/0ae14417abb444ebb02b9815e2103550/jre-8u361-windows-x64.exe&BHost=javadl.sun.com&File=jre-8u361-windows-x64.exe&AuthParam=1675507445_aaeabdb632be06052711f20f42896f2c&ext=.exe" 
+        "name": "ojdkbuild-11.0.15.9-1",
+        "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/java-11-openjdk-11.0.15.9-1/java-11-openjdk-11.0.15.9-1.windows.ojdkbuild.x86_64.zip" 
+    },{
+        "name": "ojdkbuild-17.0.3.0.6-1",
+        "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/java-17-openjdk-17.0.3.0.6-1/java-17-openjdk-17.0.3.0.6-1.win.x86_64.zip" 
     },{
         "name": "openjdk-9.0.4",
         "url": "https://download.java.net/java/GA/jdk9/9.0.4/binaries/openjdk-9.0.4_windows-x64_bin.tar.gz" 

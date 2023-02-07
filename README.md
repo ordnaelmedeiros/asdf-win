@@ -15,9 +15,14 @@ winget install Git.Git
 ## Install
 `Use PowerShell 7.3.x`
 ```shell
-git clone https://github.com/ordnaelmedeiros/asdf-win.git "${HOME}/.asdf" && ."${HOME}/.asdf/install.ps1"
+git clone https://github.com/ordnaelmedeiros/asdf-win.git "${HOME}\.asdf" && ."${HOME}\.asdf\install.ps1"
 ```
 Restart PowerShell
+
+Update:
+```shell
+git -C "${HOME}\.asdf" pull && ."${HOME}\.asdf\install.ps1"
+```
 
 ## Use
 
@@ -33,7 +38,7 @@ asdf java list
 
 install version:
 ```shell
-asdf java openjdk-11.0.2
+asdf java openjdk-11.0.2 -install
 ```
 
 set global env:

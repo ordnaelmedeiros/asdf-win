@@ -7,7 +7,7 @@ $path = "${path_plugin}\${version}"
 $path_download = "${path_cache}\${version}.${fileType}"
 $path_temp = "${path}_temp"
 
-if (test-path $path) {
+if (!$install -and (test-path $path)) {
     return
 }
 
@@ -29,17 +29,18 @@ $url =
     ).url
 
 if ($url) {
-    if (test-path $path_download) {
-        echo "cache $path_download"
+
+    if ($install -or !(test-path $path_download)) {
+        Invoke-WebRequest -Uri $url -OutFile $path_download
+        # curl $url --output $path_download
     } else {
-        curl $url --output $path_download
+        echo "cache $path_download"
     }
     if ($fileType -eq "zip") {
         if ($url.EndsWith(".zip")) {
             echo "pelo zip"
             Expand-Archive -LiteralPath $path_download -DestinationPath $path_temp
         } else {
-            echo "pelo tar.gz"
             mkdir -p $path_temp
             tar -xvzf $path_download -C $path_temp
         }

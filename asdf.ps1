@@ -13,7 +13,7 @@ function asdf() {
         [ValidateSet([PluginsNames])]
         [string]$plugin,
 
-        [Alias('i')]
+        [Alias('v')]
         [ValidateSet([LibNames])]
         [string]$version,
 
@@ -21,7 +21,10 @@ function asdf() {
         [switch]$global,
 
         [Alias('t')]
-        [switch]$terminal
+        [switch]$terminal,
+
+        [Alias('i')]
+        [switch]$install
     )
     
     if (!$plugin) {
