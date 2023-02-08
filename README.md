@@ -46,9 +46,9 @@ set global env:
 asdf java openjdk-11.0.2 -global
 ```
 
-set terminal session env:
+create config file in project (`.win-tool-versions`):
 ```shell
-asdf java openjdk-11.0.2 -terminal
+asdf java openjdk-11.0.2 -local
 ```
 
 
@@ -57,6 +57,6 @@ asdf java openjdk-11.0.2 -terminal
 in Windows environment variables, remove all references to Java, maven... etc. including Path.
 
 
-## demo
+<!-- ## demo
 
-![Alt Text](demo.gif)
+![Alt Text](demo.gif) -->

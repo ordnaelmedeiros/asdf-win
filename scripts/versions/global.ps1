@@ -1,4 +1,4 @@
-$path = "$PWD\.win-tool-versions"
+$path = "$HOME\.win-tool-versions"
 
 # $list.RemoveAt(0)
 # 1..3 | Select-Object -Skip 1

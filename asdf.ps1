@@ -23,6 +23,9 @@ function asdf() {
         [Alias('t')]
         [switch]$terminal,
 
+        [Alias('l')]
+        [switch]$local,
+
         [Alias('i')]
         [switch]$install
     )
@@ -46,7 +49,16 @@ function asdf() {
             .$ASDF_SCRIPTS\versions\list.ps1
         } else {
             .$ASDF_SCRIPTS\versions\install.ps1
-            .$ASDF_SCRIPTS\versions\set-env.ps1
+            if ($local) {
+                .$ASDF_SCRIPTS\versions\local.ps1
+            }
+            if ($global) {
+                .$ASDF_SCRIPTS\versions\global.ps1
+                .$ASDF_SCRIPTS\versions\set-env.ps1
+            }
+            if ($terminal) {
+                .$ASDF_SCRIPTS\versions\set-env.ps1
+            }
         }
     }
 
