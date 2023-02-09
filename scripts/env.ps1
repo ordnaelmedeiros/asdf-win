@@ -1,9 +1,7 @@
-$path_plugin = "${ASDF_HOME}\libs\${plugin}"
-$path = "${path_plugin}\${version}"
+$path = "${ASDF_HOME_INSTALLS}\${name}\${version}"
+$config = (Get-Content "${ASDF_HOME_PLUGINS}\${name}\config.json" | ConvertFrom-Json)
 
-$config = (Get-Content "${ASDF_HOME}\plugins\${plugin}\config.json" | ConvertFrom-Json)
-
-if (test-path $path) {
+if (Test-Path $path) {
     if ($terminal) {
         [Environment]::SetEnvironmentVariable($config.envName, $path)
     }
@@ -12,5 +10,5 @@ if (test-path $path) {
         echo "Info: Required to restart application/Powershell"
     }
 } else {
-    echo "Error: ${plugin} - ${local} not installed"
+    echo "Error: ${name} - ${version} not installed"
 }

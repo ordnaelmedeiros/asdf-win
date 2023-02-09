@@ -1,69 +1,109 @@
 $ASDF_HOME = "${HOME}\.asdf"
-$ASDF_SCRIPTS = "${ASDF_HOME}\scripts"
-$ASDF_CLASSES = "${ASDF_HOME}\classes"
+$ASDF_HOME_SCRIPTS = "${ASDF_HOME}\scripts"
+$ASDF_HOME_PLUGINS = "${ASDF_HOME}\plugins"
+$ASDF_HOME_LOCAL_REPO = "${ASDF_HOME}\local-repository"
+$ASDF_HOME_INSTALLS = "${ASDF_HOME}\installs"
+$ASDF_HOME_DOWNLOADS = "${ASDF_HOME}\downloads"
 
-$PLUGINS_NAMES = (dir "~\.asdf\plugins").Name
+$PLUGINS_NAMES = (Get-Item $ASDF_HOME_LOCAL_REPO\*).Name
 
-. $ASDF_CLASSES/PluginsNames.ps1
-. $ASDF_CLASSES/LibNames.ps1
+function Create-Param-Asdf() {
+
+    # echo "paramname: $paramname" >> "$ASDF_HOME\log.txt"
+    # echo "position: $position" >> "$ASDF_HOME\log.txt"
+    # echo "validateSet: $validateSet" >> "$ASDF_HOME\log.txt"
+
+    $ageAttribute = New-Object System.Management.Automation.ParameterAttribute
+    $ageAttribute.Position = $position
+    $attributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
+    $attributeCollection.Add($ageAttribute)
+    if ($validateSet.Length -gt 0) {
+        $ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($validateSet)
+        $attributeCollection.Add($ValidateSetAttribute)
+    }
+    $ageParam = New-Object System.Management.Automation.RuntimeDefinedParameter("$paramname", [string], $attributeCollection)
+    return $ageParam
+}
 
 function asdf() {
-    param (
-        [Alias('p')]
-        [ValidateSet([PluginsNames])]
-        [string]$plugin,
 
-        [Alias('v')]
-        [ValidateSet([LibNames])]
-        [string]$version,
+    Param (
 
-        [Alias('g')]
-        [switch]$global,
+        [Parameter(Position=0)]
+        [ValidateSet("list", "plugin", "global", "local", "install", "env")]
+        [Alias('c')]
+        [string]$command,
 
-        [Alias('t')]
         [switch]$terminal,
+        [switch]$global
 
-        [Alias('l')]
-        [switch]$local,
-
-        [Alias('i')]
-        [switch]$install
     )
-    
-    if (!$plugin) {
-        .$ASDF_SCRIPTS\banner.ps1
-        return
-    } elseif ($plugin -eq "version") {
-        .$ASDF_SCRIPTS\version.ps1
-        return
-    } elseif ($plugin -eq "update") {
-        .$ASDF_SCRIPTS\update.ps1
-        return
-    } elseif ($plugin -eq "list") {
-        .$ASDF_SCRIPTS\plugins\list.ps1
-        return
-    } else {
-        if (!$version) {
-            .$ASDF_SCRIPTS\versions\list.ps1
-        } elseif ($version -eq "list") {
-            .$ASDF_SCRIPTS\versions\list.ps1
-        } else {
-            .$ASDF_SCRIPTS\versions\install.ps1
-            if ($local) {
-                .$ASDF_SCRIPTS\versions\local.ps1
-            }
-            if ($global) {
-                .$ASDF_SCRIPTS\versions\global.ps1
-                .$ASDF_SCRIPTS\versions\set-env.ps1
-            }
-            if ($terminal) {
-                .$ASDF_SCRIPTS\versions\set-env.ps1
-            }
+
+    DynamicParam {
+
+        $paramDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
+        
+        if ($command -eq "plugin") {
+
+            $paramname = "plugincmd"
+            $position = 1
+            $validateSet = @("list", "add", "remove", "update")
+            $p = Create-Param-Asdf
+            $paramDictionary.Add("$paramname", $p)
+
+            $paramname = "plugin"
+            $position = 2
+            $validateSet = @("all") + $PLUGINS_NAMES
+            $p = Create-Param-Asdf
+            $paramDictionary.Add("$paramname", $p)
+            
+        } elseif ($command -eq "install" -or $command -eq "global" -or $command -eq "local" -or $command -eq "env") {
+
+            $paramname = "name"
+            $position = 1
+            $validateSet = $PLUGINS_NAMES
+            $p = Create-Param-Asdf
+            $paramDictionary.Add("$paramname", $p)
+
+            $paramname = "version"
+            $position = 2
+            $validateSet = @()
+            $p = Create-Param-Asdf
+            $paramDictionary.Add("$paramname", $p)
+
+        } elseif ($command -eq "list") {
+
+            $paramname = "name1"
+            $position = 1
+            $validateSet = @("all") + $PLUGINS_NAMES
+            $p = Create-Param-Asdf
+            $paramDictionary.Add("$paramname", $p)
+
+            $paramname = "name2"
+            $position = 2
+            $validateSet = $PLUGINS_NAMES
+            $p = Create-Param-Asdf
+            $paramDictionary.Add("$paramname", $p)
+
+        }
+        return $paramDictionary
+    }
+    Begin{
+        $plugincmd = $PSBoundParameters['plugincmd']
+        $plugin = $PSBoundParameters['plugin']
+        $name = $PSBoundParameters['name']
+        $version = $PSBoundParameters['version']
+
+        $name1 = $PSBoundParameters['name1']
+        $name2 = $PSBoundParameters['name2']
+    }
+    Process {
+        if ($command) {
+            ."${ASDF_HOME_SCRIPTS}\${command}.ps1"
         }
     }
+}
 
-} 
-
-foreach ($p in $PLUGINS_NAMES) {
-    . "${ASDF_HOME}\plugins\${p}\exec.ps1"
+foreach ($p in (asdf plugin list)) {
+    . "${ASDF_HOME_PLUGINS}\${p}\exec.ps1"
 }
