@@ -1,62 +1,35 @@
 # asdf-win
 
-## Requirements:
+Trying develop asdf for `Windows` and `PowerShell 7`
 
-- PowerShell 7.3.x
-- Git
+## Install:
 
+[Microsot Store winget](https://www.microsoft.com/store/productId/9NBLGGH4NNS1)
 ```shell
 winget install Microsoft.PowerShell
 ```
+`Use PowerShell 7 for next steps`
+
 ```shell
 winget install Git.Git
 ```
 
-## Install
-`Use PowerShell 7.3.x`
 ```shell
 git clone https://github.com/ordnaelmedeiros/asdf-win.git "${HOME}\.asdf" && ."${HOME}\.asdf\install.ps1"
 ```
-Restart PowerShell
+`Restart PowerShell`
 
-Update:
+From update:
 ```shell
 git -C "${HOME}\.asdf" pull && ."${HOME}\.asdf\install.ps1"
 ```
 
-## Use
+## Why use asdf?
 
-list plugins:
-```shell
-asdf list
-```
-
-list versions:
-```shell
-asdf java list
-```
-
-install version:
-```shell
-asdf java openjdk-11.0.2 -install
-```
-
-set global env:
-```shell
-asdf java openjdk-11.0.2 -global
-```
-
-create config file in project (`.win-tool-versions`):
-```shell
-asdf java openjdk-11.0.2 -local
-```
-
+- `Use PowerShell 7 always`
+- CLI compatible: [asdf-vm](https://asdf-vm.com/)
+- Doc: [asdf-vm doc](https://asdf-vm.com/manage/commands.html)
 
 ## Recommended
 
-in Windows environment variables, remove all references to Java, maven... etc. including Path.
-
-
-<!-- ## demo
-
-![Alt Text](demo.gif) -->
+in Windows environment variables, remove all references to Java, maven... etc. including in Path.
