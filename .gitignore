@@ -3,4 +3,5 @@ cache/*
 target/*
 installs/*
 downloads/*
+plugins/*
 log.txt
