@@ -24,7 +24,7 @@ From update:
 git -C "${HOME}\.asdf" pull && ."${HOME}\.asdf\install.ps1"
 ```
 
-## Why use asdf?
+## How to use asdf?
 
 - `Use PowerShell 7 always`
 - CLI compatible: [asdf-vm](https://asdf-vm.com/)

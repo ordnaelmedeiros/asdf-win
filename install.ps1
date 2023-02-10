@@ -1,9 +1,5 @@
 if (!(test-path $PROFILE.CurrentUserAllHosts)) {
-    $array = $PROFILE.CurrentUserAllHosts.split("\")
-    $array = $array[0..($array.Length-2)]
-    $path = $array -join "\"
-    mkdir -p $path
-    Write-Output "" >> $PROFILE.CurrentUserAllHosts
+    New-Item -ItemType "file" -Path $PROFILE.CurrentUserAllHosts -Force
 }
 
 $content = Get-Content $PROFILE.CurrentUserAllHosts
@@ -12,6 +8,6 @@ $content = Get-Content $PROFILE.CurrentUserAllHosts
     
 Set-Content -Path $PROFILE.CurrentUserAllHosts -Value $content
 Write-Output "" >> $PROFILE.CurrentUserAllHosts
-Write-Output ". '${HOME}\.asdf\asdf.ps1'" >> $PROFILE.CurrentUserAllHosts
+Write-Output ". '${HOME}\.asdf\launcher.ps1'" >> $PROFILE.CurrentUserAllHosts
 
-."${HOME}\.asdf\asdf.ps1"
+."${HOME}\.asdf\launcher.ps1"
