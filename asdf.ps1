@@ -6,10 +6,10 @@ $ASDF_HOME_INSTALLS = "${ASDF_HOME}\installs"
 $ASDF_HOME_DOWNLOADS = "${ASDF_HOME}\downloads"
 
 $PLUGINS_NAMES = (Get-Item $ASDF_HOME_LOCAL_REPO\*).Name
-$VERSIONS_NAMES = @()
-foreach ($i in (Get-Item $ASDF_HOME_LOCAL_REPO\*).Name) {
-    $VERSIONS_NAMES += (Get-Content "$ASDF_HOME_LOCAL_REPO\$i\versions.json" | ConvertFrom-Json).name
-}
+# $VERSIONS_NAMES = @()
+# foreach ($i in (Get-Item $ASDF_HOME_LOCAL_REPO\*).Name) {
+#     $VERSIONS_NAMES += (Get-Content "$ASDF_HOME_LOCAL_REPO\$i\versions.json" | ConvertFrom-Json).name
+# }
 
 function Create-Param-Asdf() {
 
@@ -72,7 +72,7 @@ function asdf() {
 
             $paramname = "version"
             $position = 2
-            $validateSet = $VERSIONS_NAMES
+            $validateSet = @()
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
