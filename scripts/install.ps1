@@ -29,6 +29,9 @@ if ($name -and $version) {
             ).url
 
         if ($url) {
+            $config = Get-Content "$ASDF_HOME_PLUGINS\$name\config.json" | ConvertFrom-Json
+            $configFileType = $config.fileType
+            $configFolderPath = $config.folderPath
             if (Test-Path $path_download) {
                 Remove-Item -Recurse -Path $path_download
             }
@@ -43,17 +46,19 @@ if ($name -and $version) {
             }
             New-Item -ItemType Directory -Path $path_install
             New-Item -ItemType Directory -Path $path_install_tmp
-            if ($url.EndsWith(".zip")) {
-                Expand-Archive -LiteralPath "$path_download\file" -DestinationPath $path_install_tmp
-                Copy-Item -Recurse -Path ${path_install_tmp}\*\* -Destination "$path_install"
-                Remove-Item -Recurse -Path $path_install_tmp
-            } elseif ($url.EndsWith(".tar.gz")) {
-                tar -xvzf "$path_download\file" -C $path_install_tmp
-                Copy-Item -Recurse -Path ${path_install_tmp}\*\* -Destination "$path_install"
-                Remove-Item -Recurse -Path $path_install_tmp
+
+            if ($configFileType -eq "folder") {
+                if ($url.EndsWith(".zip")) {
+                    Expand-Archive -LiteralPath "$path_download\file" -DestinationPath $path_install_tmp
+                    Copy-Item -Recurse -Path ${path_install_tmp}${configFolderPath}* -Destination "$path_install"
+                } elseif ($url.EndsWith(".tar.gz")) {
+                    tar -xvzf "$path_download\file" -C $path_install_tmp
+                    Copy-Item -Recurse -Path ${path_install_tmp}${configFolderPath}* -Destination "$path_install"
+                }
             } else {
-                Copy-Item -Path "$path_download\file" -Destination "$path_install\exec"
+                Copy-Item -Path "$path_download\file" -Destination "$path_install\file.${configFileType}"
             }
+            Remove-Item -Recurse -Path $path_install_tmp
             Write-Output "$name - $version installed"
 
         } else {
@@ -62,4 +67,31 @@ if ($name -and $version) {
 
     }
 
+} elseif ($name) {
+    if (Test-Path "$PWD\.win-tool-versions") {
+        Get-Content "$PWD\.win-tool-versions"
+            | Select-String -Pattern "^$name "
+            | ForEach-Object {
+                $pluginarray = $_.ToString().split(" ")
+                $p = $pluginarray[0]
+                $l = $pluginarray[1]
+                asdf plugin add $p
+                asdf install $p $l
+            }
+    } else {
+        Write-Warning "local config not found"
+    }
+} else {
+    if (Test-Path "$PWD\.win-tool-versions") {
+        Get-Content "$PWD\.win-tool-versions" |
+            ForEach-Object {
+                $pluginarray = $_.split(" ")
+                $p = $pluginarray[0]
+                $l = $pluginarray[1]
+                asdf plugin add $p
+                asdf install $p $l
+            }
+    } else {
+        Write-Warning "local config not found"
+    }
 }

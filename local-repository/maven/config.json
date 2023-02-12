@@ -1,4 +1,5 @@
 {
-    "fileType": "zip",
+    "fileType": "folder",
+    "folderPath": "/*/",
     "envName": "MVN_HOME"
 }

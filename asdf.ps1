@@ -7,8 +7,8 @@ $ASDF_HOME_DOWNLOADS = "${ASDF_HOME}\downloads"
 
 $PLUGINS_NAMES = (Get-Item $ASDF_HOME_LOCAL_REPO\*).Name
 $VERSIONS_NAMES = @()
-foreach ($i in (Get-Item $ASDF_HOME_PLUGINS\*).Name) {
-    $VERSIONS_NAMES += (Get-Content "$ASDF_HOME_PLUGINS\$i\versions.json" | ConvertFrom-Json).name
+foreach ($i in (Get-Item $ASDF_HOME_LOCAL_REPO\*).Name) {
+    $VERSIONS_NAMES += (Get-Content "$ASDF_HOME_LOCAL_REPO\$i\versions.json" | ConvertFrom-Json).name
 }
 
 function Create-Param-Asdf() {
@@ -39,7 +39,8 @@ function asdf() {
         [string]$command,
 
         [switch]$terminal,
-        [switch]$global
+        [switch]$global,
+        [switch]$all
 
     )
 
@@ -49,13 +50,13 @@ function asdf() {
         
         if ($command -eq "plugin") {
 
-            $paramname = "plugincmd"
+            $paramname = "plugin"
             $position = 1
             $validateSet = @("list", "add", "remove", "update")
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
-            $paramname = "plugin"
+            $paramname = "name"
             $position = 2
             $validateSet = @("all") + $PLUGINS_NAMES
             $p = Create-Param-Asdf

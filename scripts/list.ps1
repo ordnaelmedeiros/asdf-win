@@ -11,6 +11,15 @@ if ($name1 -eq "all") {
     } else {
         Write-Warning "name is required"
     }
+} elseif ($name1) {
+    if (Test-Path "$ASDF_HOME_INSTALLS\$name1") {
+        (Get-Item "$ASDF_HOME_INSTALLS\$name1\*").Name
+    }
 } else {
-
+    foreach ($i in (Get-Item "$ASDF_HOME_INSTALLS\*").Name) {
+        Write-Output "$i"
+        foreach ($j in (Get-Item "$ASDF_HOME_INSTALLS\$i\*").Name) {
+            Write-Output "  $j"
+        }
+    }
 }
