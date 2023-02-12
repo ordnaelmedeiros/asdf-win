@@ -54,7 +54,6 @@ if ($name -and $version) {
             } else {
                 Copy-Item -Path "$path_download\file" -Destination "$path_install\exec"
             }
-
             Write-Output "$name - $version installed"
 
         } else {

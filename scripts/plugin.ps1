@@ -31,7 +31,9 @@ if ($plugincmd -eq "add") {
 } elseif ($plugincmd -eq "remove") {
     if ($plugin) {
         if (Test-Path "$ASDF_HOME_PLUGINS\$plugin") {
-            Remove-Item -Recurse -Path "$ASDF_HOME_INSTALLS\$plugin"
+            if (Test-Path "$ASDF_HOME_INSTALLS\$plugin") {
+                Remove-Item -Recurse -Path "$ASDF_HOME_INSTALLS\$plugin"
+            }
             Remove-Item -Recurse -Path "$ASDF_HOME_PLUGINS\$plugin"
             Write-Output "plugin removed"
         } else {

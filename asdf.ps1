@@ -6,6 +6,10 @@ $ASDF_HOME_INSTALLS = "${ASDF_HOME}\installs"
 $ASDF_HOME_DOWNLOADS = "${ASDF_HOME}\downloads"
 
 $PLUGINS_NAMES = (Get-Item $ASDF_HOME_LOCAL_REPO\*).Name
+$VERSIONS_NAMES = @()
+foreach ($i in (Get-Item $ASDF_HOME_PLUGINS\*).Name) {
+    $VERSIONS_NAMES += (Get-Content "$ASDF_HOME_PLUGINS\$i\versions.json" | ConvertFrom-Json).name
+}
 
 function Create-Param-Asdf() {
 
@@ -13,16 +17,16 @@ function Create-Param-Asdf() {
     # echo "position: $position" >> "$ASDF_HOME\log.txt"
     # echo "validateSet: $validateSet" >> "$ASDF_HOME\log.txt"
 
-    $ageAttribute = New-Object System.Management.Automation.ParameterAttribute
-    $ageAttribute.Position = $position
-    $attributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
-    $attributeCollection.Add($ageAttribute)
+    $ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
+    $ParameterAttribute.Position = $position
+    $AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
+    $AttributeCollection.Add($ParameterAttribute)
     if ($validateSet.Length -gt 0) {
         $ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($validateSet)
-        $attributeCollection.Add($ValidateSetAttribute)
+        $AttributeCollection.Add($ValidateSetAttribute)
     }
-    $ageParam = New-Object System.Management.Automation.RuntimeDefinedParameter("$paramname", [string], $attributeCollection)
-    return $ageParam
+    $RuntimeDefinedParameter = New-Object System.Management.Automation.RuntimeDefinedParameter("$paramname", [string], $attributeCollection)
+    return $RuntimeDefinedParameter
 }
 
 function asdf() {
@@ -30,7 +34,7 @@ function asdf() {
     Param (
 
         [Parameter(Position=0)]
-        [ValidateSet("list", "plugin", "global", "local", "install", "env")]
+        [ValidateSet("list", "plugin", "global", "local", "install", "uninstall", "env")]
         [Alias('c')]
         [string]$command,
 
@@ -57,7 +61,7 @@ function asdf() {
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
             
-        } elseif ($command -eq "install" -or $command -eq "global" -or $command -eq "local" -or $command -eq "env") {
+        } elseif ($command -eq "install" -or $command -eq "global" -or $command -eq "local" -or $command -eq "uninstall" -or $command -eq "env") {
 
             $paramname = "name"
             $position = 1
@@ -67,7 +71,7 @@ function asdf() {
 
             $paramname = "version"
             $position = 2
-            $validateSet = @()
+            $validateSet = $VERSIONS_NAMES
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
@@ -104,6 +108,6 @@ function asdf() {
     }
 }
 
-foreach ($p in (asdf plugin list)) {
-    . "${ASDF_HOME_PLUGINS}\${p}\exec.ps1"
+foreach ($p in (Get-Item "${ASDF_HOME_PLUGINS}\*")) {
+    . "${p}\exec.ps1"
 }
