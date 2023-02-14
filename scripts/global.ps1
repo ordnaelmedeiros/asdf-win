@@ -27,10 +27,6 @@ if ($name -and $version) {
 
         Write-Output "${name} ${version}" >> $path
 
-
-        echo "aqui"
-        Get-Content $path
-
         Get-Content $path |
             ForEach-Object {
                 $pluginarray = $_.split(" ")
@@ -40,7 +36,6 @@ if ($name -and $version) {
                 $EnvPath += ";$ASDF_HOME_INSTALLS\$p\$l$winPath"
             }
 
-        echo $EnvPath
         [Environment]::SetEnvironmentVariable("PATH", $EnvPath, "User")
         
 
