@@ -1,5 +1,6 @@
 {
     "fileType": "folder",
     "folderPath": "/*/",
-    "envName": "NODEJS_HOME"
+    "envName": "NODE_HOME",
+    "winPath": "\\"
 }

@@ -22,8 +22,27 @@ if ($name -and $version) {
 
         $global = $true
         asdf env $name $version
-        
+
+        $EnvPath = $env:PATH.Split(";") | Select-String -Pattern "asdf" -NotMatch | Join-String -Separator ";"
+
         Write-Output "${name} ${version}" >> $path
+
+
+        echo "aqui"
+        Get-Content $path
+
+        Get-Content $path |
+            ForEach-Object {
+                $pluginarray = $_.split(" ")
+                $p = $pluginarray[0]
+                $l = $pluginarray[1]
+                $winPath = (Get-Content "$ASDF_HOME_PLUGINS\$p\config.json" | ConvertFrom-Json).winPath
+                $EnvPath += ";$ASDF_HOME_INSTALLS\$p\$l$winPath"
+            }
+
+        echo $EnvPath
+        [Environment]::SetEnvironmentVariable("PATH", $EnvPath, "User")
+        
 
     } else {
         Write-Warning "$name - $version not instaled"

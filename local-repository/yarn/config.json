@@ -1,5 +1,6 @@
 {
     "fileType": "folder",
     "folderPath": "/*/",
-    "envName": "YARN_HOME"
+    "envName": "YARN_HOME",
+    "winPath": "\\bin"
 }

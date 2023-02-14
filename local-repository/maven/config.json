@@ -1,5 +1,6 @@
 {
     "fileType": "folder",
     "folderPath": "/*/",
-    "envName": "MVN_HOME"
+    "envName": "MVN_HOME",
+    "winPath": "\\bin"
 }

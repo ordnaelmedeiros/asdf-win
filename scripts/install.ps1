@@ -58,6 +58,9 @@ if ($name -and $version) {
             } else {
                 Copy-Item -Path "$path_download\file" -Destination "$path_install\file.${configFileType}"
             }
+            if (Test-Path "$ASDF_HOME_PLUGINS\$name\install.ps1") {
+                ."$ASDF_HOME_PLUGINS\$name\install.ps1"
+            }
             Remove-Item -Recurse -Path $path_install_tmp
             Write-Output "$name - $version installed"
 

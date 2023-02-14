@@ -109,6 +109,55 @@ function asdf() {
     }
 }
 
-foreach ($p in (Get-Item "${ASDF_HOME_PLUGINS}\*")) {
-    . "${p}\exec.ps1"
+$PromptScript = (Get-Command Prompt).ScriptBlock
+$EnvPathBacup = $env:PATH.Split(";") | Select-String -Pattern "asdf" -NotMatch | Join-String -Separator ";"
+
+function Prompt {
+
+    $infos = @{}
+    $infosLocal = @{}
+    
+    Get-Content "$HOME\.win-tool-versions" |
+        ForEach-Object {
+            $pluginarray = $_.split(" ")
+            $p = $pluginarray[0]
+            $l = $pluginarray[1]
+            $infos[$p] = $l
+        }
+    $array = $PWD.ToString().split("\")
+    foreach ( $i in $array ) {
+        $versionspath += $i + "\"
+        if (Test-Path "$versionspath.win-tool-versions") {
+            Get-Content "$versionspath.win-tool-versions" |
+                ForEach-Object {
+                    $pluginarray = $_.split(" ")
+                    $p = $pluginarray[0]
+                    $l = $pluginarray[1]
+                    $infos[$p] = $l
+                    $infosLocal[$p] = $l
+                }
+        }
+    }
+
+    $env:PATH = $EnvPathBacup
+    foreach ($Key in $infos.Keys) {
+        if (Test-Path "$ASDF_HOME_PLUGINS\$Key") {
+            $pluginConfig = (Get-Content "$ASDF_HOME_PLUGINS\$Key\config.json" | ConvertFrom-Json)
+            $winPath = $pluginConfig.winPath
+            $envName = $pluginConfig.envName
+            [Environment]::SetEnvironmentVariable($envName, "$ASDF_HOME_INSTALLS\$Key\$($infos[$Key])")
+            $env:PATH += ";$ASDF_HOME_INSTALLS\$Key\$($infos[$Key])$winPath"
+            $infosToText += "$Key $($infos[$Key]) | "
+        }
+    }
+
+    if ((Get-Content "$HOME\.asdf-config" | ConvertFrom-Json).showPromptVersions -eq "true") {
+        $infosToText = ""
+        foreach ($Key in $infosLocal.Keys) {
+            $infosToText += "| $Key $($infos[$Key]) "
+        }
+        Write-Host -ForegroundColor DarkGreen $infosToText # -NoNewline
+    }
+    .$PromptScript
+
 }

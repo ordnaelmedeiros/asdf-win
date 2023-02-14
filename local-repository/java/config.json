@@ -1,5 +1,6 @@
 {
     "fileType": "folder",
     "folderPath": "/*/",
-    "envName": "JAVA_HOME"
+    "envName": "JAVA_HOME",
+    "winPath": "\\bin"
 }

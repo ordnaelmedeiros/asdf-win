@@ -1,6 +1,9 @@
 $array = $PWD.ToString().split("\")
 $versionspath = ""
 
+# $env:PATH += ";C:\Users\lrmar\.asdf\installs\nodejs\18.14.0"
+# echo $env:PATH
+
 Get-Content "$HOME\.win-tool-versions" |
     ForEach-Object {
         $pluginarray = $_.split(" ")
