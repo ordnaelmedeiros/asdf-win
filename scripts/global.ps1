@@ -38,6 +38,9 @@ if ($name -and $version) {
 
         [Environment]::SetEnvironmentVariable("PATH", $EnvPath, "User")
         
+        if (Test-Path "$ASDF_HOME_PLUGINS\$name\global.ps1") {
+            ."$ASDF_HOME_PLUGINS\$name\global.ps1"
+        }
 
     } else {
         Write-Warning "$name - $version not instaled"
