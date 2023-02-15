@@ -12,8 +12,9 @@
 # asdf plugin update --all                Update all plugins to latest commit on
 #                                         default branch
 
-# echo "plugincmd: $plugin"
 # echo "plugin: $plugin"
+# echo "name: $name"
+# echo "all: $all"
 
 if ($plugin -eq "add") {
     if ($plugin -and $PLUGINS_NAMES.contains($name)) {

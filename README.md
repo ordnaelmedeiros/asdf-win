@@ -19,9 +19,9 @@ git clone https://github.com/ordnaelmedeiros/asdf-win.git "${HOME}\.asdf" && ."$
 ```
 `Restart PowerShell`
 
-From update:
+update:
 ```shell
-git -C "${HOME}\.asdf" pull && ."${HOME}\.asdf\install.ps1"
+asdf update"
 ```
 
 ## How to use asdf?

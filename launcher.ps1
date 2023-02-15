@@ -6,6 +6,8 @@ if (Get-ChildItem $ASDF_UPDATELOG_FILE | Where-Object { $_.LastWriteTime -le (Ge
     Get-Date > $ASDF_UPDATELOG_FILE
     Write-Warning "asdf updating ..."
     git -C "${HOME}\.asdf" pull
+    . "${HOME}\.asdf\asdf.ps1"
     asdf plugin update -all
+} else {
+    . "${HOME}\.asdf\asdf.ps1"
 }
-. "${HOME}\.asdf\asdf.ps1"

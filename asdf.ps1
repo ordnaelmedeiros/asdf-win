@@ -34,7 +34,7 @@ function asdf() {
     Param (
 
         [Parameter(Position=0)]
-        [ValidateSet("list", "plugin", "global", "local", "install", "uninstall", "env")]
+        [ValidateSet("list", "plugin", "global", "local", "install", "uninstall", "update", "env")]
         [Alias('c')]
         [string]$command,
 
@@ -105,6 +105,8 @@ function asdf() {
     Process {
         if ($command) {
             ."${ASDF_HOME_SCRIPTS}\${command}.ps1"
+        } else {
+            Get-Content "$ASDF_HOME\version.txt"
         }
     }
 }
