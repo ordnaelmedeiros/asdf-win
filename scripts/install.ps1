@@ -21,12 +21,16 @@ if ($name -and $version) {
         $path_install = "$ASDF_HOME_INSTALLS\$name\$version"
         $path_install_tmp = "$ASDF_HOME_INSTALLS\$name\tmp"
 
-        $url = 
-            (
-                Get-Content "$ASDF_HOME_PLUGINS\$name\versions.json"
-                    | ConvertFrom-Json
-                    | Where-Object { $_.name -eq $version }
-            ).url
+        if (Test-Path "$ASDF_HOME_PLUGINS\$name\get-url.ps1") {
+            $url = ."$ASDF_HOME_PLUGINS\$name\get-url.ps1"
+        } else {
+            $url = 
+                (
+                    Get-Content "$ASDF_HOME_PLUGINS\$name\versions.json"
+                        | ConvertFrom-Json
+                        | Where-Object { $_.name -eq $version }
+                ).url
+        }
 
         if ($url) {
             $config = Get-Content "$ASDF_HOME_PLUGINS\$name\config.json" | ConvertFrom-Json

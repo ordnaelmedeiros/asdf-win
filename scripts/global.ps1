@@ -20,8 +20,7 @@ if ($name -and $version) {
         
         Set-Content -Path $path -Value $content
 
-        $global = $true
-        asdf env $name $version
+        asdf env $name $version -global
 
         $EnvPath = $env:PATH.Split(";") | Select-String -Pattern "asdf" -NotMatch | Join-String -Separator ";"
 
