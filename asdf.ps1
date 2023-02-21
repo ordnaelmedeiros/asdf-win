@@ -1,4 +1,5 @@
 $ASDF_HOME = "${HOME}\.asdf"
+$ASDF_HOME_SRC = "${HOME}\.asdf\src"
 $ASDF_HOME_SCRIPTS = "${ASDF_HOME}\scripts"
 $ASDF_HOME_PLUGINS = "${ASDF_HOME}\plugins"
 $ASDF_HOME_LOCAL_REPO = "${ASDF_HOME}\local-repository"
@@ -6,10 +7,8 @@ $ASDF_HOME_INSTALLS = "${ASDF_HOME}\installs"
 $ASDF_HOME_DOWNLOADS = "${ASDF_HOME}\downloads"
 
 $PLUGINS_NAMES = (Get-Item $ASDF_HOME_LOCAL_REPO\*).Name
-# $VERSIONS_NAMES = @()
-# foreach ($i in (Get-Item $ASDF_HOME_LOCAL_REPO\*).Name) {
-#     $VERSIONS_NAMES += (Get-Content "$ASDF_HOME_LOCAL_REPO\$i\versions.json" | ConvertFrom-Json).name
-# }
+
+."$ASDF_HOME_SCRIPTS\import.ps1"
 
 function Create-Param-Asdf() {
 
@@ -35,8 +34,7 @@ function asdf() {
 
         [Parameter(Position=0)]
         [ValidateSet("list", "plugin", "global", "local", "install", "uninstall", "update", "env")]
-        [Alias('c')]
-        [string]$command,
+        [string]$program,
 
         [switch]$terminal,
         [switch]$global,
@@ -48,9 +46,9 @@ function asdf() {
 
         $paramDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
         
-        if ($command -eq "plugin") {
+        if ($program -eq "plugin") {
 
-            $paramname = "plugin"
+            $paramname = "command"
             $position = 1
             $validateSet = @("list", "add", "remove", "update")
             $p = Create-Param-Asdf
@@ -62,7 +60,7 @@ function asdf() {
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
             
-        } elseif ($command -eq "install" -or $command -eq "global" -or $command -eq "local" -or $command -eq "uninstall" -or $command -eq "env") {
+        } elseif (("install", "global", "local", "uninstall", "env").contains($program)) {
 
             $paramname = "name"
             $position = 1
@@ -76,7 +74,7 @@ function asdf() {
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
-        } elseif ($command -eq "list") {
+        } elseif ($program -eq "list") {
 
             $paramname = "name1"
             $position = 1
@@ -94,7 +92,7 @@ function asdf() {
         return $paramDictionary
     }
     Begin{
-        $plugincmd = $PSBoundParameters['plugincmd']
+        $command = $PSBoundParameters['command']
         $plugin = $PSBoundParameters['plugin']
         $name = $PSBoundParameters['name']
         $version = $PSBoundParameters['version']
@@ -103,9 +101,11 @@ function asdf() {
         $name2 = $PSBoundParameters['name2']
     }
     Process {
-        if ($command) {
-            ."${ASDF_HOME_SCRIPTS}\${command}.ps1"
+        if ($program) {
+            ."${ASDF_HOME_SCRIPTS}\${program}.ps1"
         } else {
+            Get-Content "$ASDF_HOME\help.txt"
+            Get-Content "$ASDF_HOME\banner.txt"
             Get-Content "$ASDF_HOME\version.txt"
         }
     }
