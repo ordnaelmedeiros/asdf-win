@@ -14,6 +14,10 @@ asdf plugin update -all                 Update all plugins to latest commit on
 
 
 MANAGE PACKAGES
+asdf current                            Display current version set or being
+                                        used for all packages
+asdf current <name>                     Display current version set or being
+                                        used for package
 asdf list <name> [version]              List installed versions of a package and
                                         optionally filter the versions
 asdf list <name> -all [<version>]       List all versions of a package and
