@@ -22,3 +22,4 @@ asdf list <name> [version]              List installed versions of a package and
                                         optionally filter the versions
 asdf list <name> -all [<version>]       List all versions of a package and
                                         optionally filter the returned versions
+asdf global <name> <version>            Set the package global version

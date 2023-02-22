@@ -1,51 +1,15 @@
-# asdf global <name> <version>            Set the package global version
 # asdf global <name> latest[:<version>]   Set the package global version to the
 #                                         latest provided version
 
-# echo "$name - $version"
+$pluginManager = [AsdfPluginManager]::new()
 
 if ($name -and $version) {
-
-    if (Test-Path "$ASDF_HOME_INSTALLS\$name\$version") {
-
-        $path = "$HOME\.win-tool-versions"
-        
-        if (!(Test-Path $path)) {
-            Write-Output "" >> $path
-        }
-        
-        $content = Get-Content $path
-            | Select-String -Pattern "$name" -NotMatch
-            | Select-String -Pattern "\S"
-        
-        Set-Content -Path $path -Value $content
-
-        asdf env $name $version -global
-
-        $EnvPath = $env:PATH.Split(";") | Select-String -Pattern "asdf" -NotMatch | Join-String -Separator ";"
-
-        Write-Output "${name} ${version}" >> $path
-
-        Get-Content $path |
-            ForEach-Object {
-                $pluginarray = $_.split(" ")
-                $p = $pluginarray[0]
-                $l = $pluginarray[1]
-                $winPath = (Get-Content "$ASDF_HOME_PLUGINS\$p\config.json" | ConvertFrom-Json).winPath
-                $EnvPath += ";$ASDF_HOME_INSTALLS\$p\$l$winPath"
-            }
-
-        [Environment]::SetEnvironmentVariable("PATH", $EnvPath, "User")
-        
-        if (Test-Path "$ASDF_HOME_PLUGINS\$name\global.ps1") {
-            ."$ASDF_HOME_PLUGINS\$name\global.ps1"
-        }
-
+    $version = ($pluginManager.installed() | Where-Object { $_.name -eq $name }).installed() | Where-Object { $_.name -eq $version }
+    if ($version) {
+        $version.global()
     } else {
-        Write-Warning "$name - $version not instaled"
+        Write-Warning "name or version not found"
     }
-
-
 } else {
-    Write-Warning "plugin and version required"
+    Write-Warning "name and version required"
 }
