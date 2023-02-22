@@ -9,5 +9,12 @@ asdf plugin list all                    List plugins registered on asdf-plugins
 asdf plugin remove <name>               Remove plugin and package versions
 asdf plugin update <name>               Update a plugin to latest commit on
                                         default branch or a particular git-ref
-asdf plugin update --all                Update all plugins to latest commit on
+asdf plugin update -all                 Update all plugins to latest commit on
                                         default branch
+
+
+MANAGE PACKAGES
+asdf list <name> [version]              List installed versions of a package and
+                                        optionally filter the versions
+asdf list <name> -all [<version>]       List all versions of a package and
+                                        optionally filter the returned versions

@@ -1,25 +1,38 @@
-# asdf list <name> [version]              List installed versions of a package and
-#                                         optionally filter the versions
-# asdf list all <name> [<version>]        List all versions of a package and
-#                                         optionally filter the returned versions
+$pluginManager = [AsdfPluginManager]::new()
 
-if ($name1 -eq "all") {
-    if ($name2) {
-        if (Test-Path "$ASDF_HOME_PLUGINS\$name2") {
-            (Get-Content "$ASDF_HOME_PLUGINS\$name2\versions.json" | ConvertFrom-Json).name
+function showByFilters() {
+    foreach($v in $list) {
+        if ($filter) {
+            $msg = "none"
+            foreach($f in $filter) {
+                if ($v -like "*$f*") {
+                    $msg = $v
+                }
+            }
+            if ($msg -ne "none") {
+                Write-Output $msg
+            }
+        } else {
+            Write-Output $v
         }
+    }
+}
+
+if ($all) {
+    if ($name) {
+        $list = ($pluginManager.installed() | Where-Object { $_.name -eq $name }).all().name
+        showByFilters
     } else {
-        Write-Warning "name is required"
+        Write-Warning "Plugin is required"
     }
-} elseif ($name1) {
-    if (Test-Path "$ASDF_HOME_INSTALLS\$name1") {
-        (Get-Item "$ASDF_HOME_INSTALLS\$name1\*").Name
-    }
+} elseif ($name) {
+    $list = ($pluginManager.installed() | Where-Object { $_.name -eq $name }).installed().name
+    showByFilters
 } else {
-    foreach ($i in (Get-Item "$ASDF_HOME_INSTALLS\*").Name) {
-        Write-Output "$i"
-        foreach ($j in (Get-Item "$ASDF_HOME_INSTALLS\$i\*").Name) {
-            Write-Output "  $j"
+    foreach($p in $pluginManager.installed()) {
+        Write-Output $p.name
+        foreach($v in $p.installed()) {
+            Write-Output "  $($v.name)"
         }
     }
 }

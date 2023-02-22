@@ -24,7 +24,7 @@ function Create-Param-Asdf() {
         $ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($validateSet)
         $AttributeCollection.Add($ValidateSetAttribute)
     }
-    $RuntimeDefinedParameter = New-Object System.Management.Automation.RuntimeDefinedParameter("$paramname", [string], $attributeCollection)
+    $RuntimeDefinedParameter = New-Object System.Management.Automation.RuntimeDefinedParameter("$paramname", $paramtype, $attributeCollection)
     return $RuntimeDefinedParameter
 }
 
@@ -46,6 +46,8 @@ function asdf() {
 
         $paramDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
         
+        $paramtype = [string]
+
         if ($program -eq "plugin") {
 
             $paramname = "command"
@@ -76,15 +78,16 @@ function asdf() {
 
         } elseif ($program -eq "list") {
 
-            $paramname = "name1"
+            $paramname = "name"
             $position = 1
-            $validateSet = @("all") + $PLUGINS_NAMES
+            $validateSet = $PLUGINS_NAMES
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
-            $paramname = "name2"
+            $paramname = "filter"
+            $paramtype = [string[]]
             $position = 2
-            $validateSet = $PLUGINS_NAMES
+            $validateSet = @()
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
@@ -96,9 +99,7 @@ function asdf() {
         $plugin = $PSBoundParameters['plugin']
         $name = $PSBoundParameters['name']
         $version = $PSBoundParameters['version']
-
-        $name1 = $PSBoundParameters['name1']
-        $name2 = $PSBoundParameters['name2']
+        $filter = $PSBoundParameters['filter']
     }
     Process {
         if ($program) {

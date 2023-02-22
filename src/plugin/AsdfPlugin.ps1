@@ -20,4 +20,23 @@ class AsdfPlugin {
         [AsdfUtils]::trace("Plugin $($this.name) removed")
     }
 
+    [AsdfVersion[]] installed() {
+        $list = @()
+        $path = "$([AsdfStatics]::ASDF_HOME_INSTALLS)\$($this.name)\*" 
+        if (Test-Path $path) {
+            foreach($i in Get-Item $path) {
+                $list += [AsdfVersion]::new($i.Name)
+            }
+        }
+        return $list
+    }
+
+    [AsdfVersion[]] all() {
+        $list = @()
+        foreach($i in (Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)\versions.json" | ConvertFrom-Json)) {
+            $list += [AsdfVersion]::new($i.Name)
+        }
+        return $list
+    }
+
 }
