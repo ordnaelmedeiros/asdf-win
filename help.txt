@@ -23,3 +23,4 @@ asdf list <name> [version]              List installed versions of a package and
 asdf list <name> -all [<version>]       List all versions of a package and
                                         optionally filter the returned versions
 asdf global <name> <version>            Set the package global version
+asdf help <name>                        Output documentation for plugin and tool

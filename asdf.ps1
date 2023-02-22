@@ -33,7 +33,7 @@ function asdf() {
     Param (
 
         [Parameter(Position=0)]
-        [ValidateSet("plugin", "current", "list", "global", "local", "install", "uninstall", "update", "env")]
+        [ValidateSet("plugin", "current", "list", "global", "help", "local", "install", "uninstall", "update", "env")]
         [string]$program,
 
         [switch]$terminal,
@@ -62,7 +62,7 @@ function asdf() {
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
         
-        } elseif (("current").contains($program)) {
+        } elseif (("current", "help").contains($program)) {
 
             $paramname = "name"
             $position = 1
