@@ -24,3 +24,8 @@ asdf list <name> -all [<version>]       List all versions of a package and
                                         optionally filter the returned versions
 asdf global <name> <version>            Set the package global version
 asdf help <name>                        Output documentation for plugin and tool
+asdf install                            Install all the package versions listed
+                                        in the .tool-versions file
+asdf install <name>                     Install one tool at the version
+                                        specified in the .tool-versions file
+asdf install <name> <version>           Install a specific version of a package
