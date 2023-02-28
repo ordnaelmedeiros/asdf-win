@@ -204,14 +204,19 @@ class AsdfVersion {
         $this.path = "No version is set. Run 'asdf <global|shell|local> $($plugin.name) <version>'"
     }
 
-    [void] configEnv() {
-        $dest = "$([AsdfStatics]::ASDF_HOME_INSTALLS)\$($this.plugin.name)\$($this.name)"
-        $config = (Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\config.json" | ConvertFrom-Json)
-        [Environment]::SetEnvironmentVariable($config.envName, $dest, 'User')
-    }
-
     [void] global() {
         $dest = "$([AsdfStatics]::HOME)\.win-tool-versions"
+        $this.writeToolFile($dest)
+        $this.configEnv("User")
+    }
+
+    [void] local() {
+        $dest = "$PWD\.win-tool-versions"
+        $this.writeToolFile($dest)
+        $this.configEnv("Shell")
+    }
+
+    [void] writeToolFile([string]$dest) {
         if (!(Test-Path $dest)) {
             Write-Output "" >> $dest
         }
@@ -220,7 +225,16 @@ class AsdfVersion {
             | Select-String -Pattern "\S"
         Set-Content -Path $dest -Value $content
         Write-Output "$($this.plugin.name) $($this.name)" >> $dest
-        $this.configEnv()
+    }
+
+    [void] configEnv([string]$scope) {
+        $dest = "$([AsdfStatics]::ASDF_HOME_INSTALLS)\$($this.plugin.name)\$($this.name)"
+        $config = (Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\config.json" | ConvertFrom-Json)
+        if ($scope -eq "Shell") {
+            [Environment]::SetEnvironmentVariable($config.envName, $dest)
+        } else {
+            [Environment]::SetEnvironmentVariable($config.envName, $dest, $scope)
+        }
     }
 
     [void] install() {
