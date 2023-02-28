@@ -1,20 +1,12 @@
-# asdf install                            Install all the package versions listed
-#                                         in the .tool-versions file
-# asdf install <name>                     Install one tool at the version
-#                                         specified in the .tool-versions file
-# asdf install <name> <version>           Install a specific version of a package
-# asdf install <name> latest[:<version>]  Install the latest stable version of a
-#                                         package, or with optional version,
-#                                         install the latest stable version that
-#                                         begins with the given string
-
-# echo "name: $name"
-# echo "version: $version"
+$pluginManager = [AsdfPluginManager]::new()
 
 if ($name -and $version) {
-    if (Test-Path "$ASDF_HOME_INSTALLS\$name\$version") {
-        Remove-Item -Recurse -Path "$ASDF_HOME_INSTALLS\$name\$version"
+    $version = ($pluginManager.installed() | Where-Object { $_.name -eq $name }).installed() | Where-Object { $_.name -eq $version }
+    if ($version) {
+        $version.uninstall()
     } else {
-        Write-Warning "$name $version not installed"
+        Write-Warning "name or version not found"
     }
+} else {
+    Write-Warning "name and version required"
 }

@@ -30,3 +30,4 @@ asdf list <name> [version]              List installed versions of a package and
 asdf list <name> -all [<version>]       List all versions of a package and
                                         optionally filter the returned versions
 asdf local <name> <version>             Set the package local version
+asdf uninstall <name> <version>         Remove a specific version of a package

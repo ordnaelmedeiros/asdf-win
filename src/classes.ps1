@@ -237,6 +237,10 @@ class AsdfVersion {
         }
     }
 
+    [void] uninstall() {
+        Remove-Item -Recurse -Path "$([AsdfStatics]::ASDF_HOME_INSTALLS)\$($this.plugin.name)\$($this.name)"
+    }
+
     [void] install() {
 
         $path_install = "$([AsdfStatics]::ASDF_HOME_INSTALLS)\$($this.plugin.name)\$($this.name)"
