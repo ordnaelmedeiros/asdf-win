@@ -33,7 +33,7 @@ function asdf() {
     Param (
 
         [Parameter(Position=0)]
-        [ValidateSet("plugin", "current", "list", "global", "help", "local", "install", "uninstall", "update", "env")]
+        [ValidateSet("plugin", "current", "list", "global", "help", "local", "install", "uninstall", "update")]
         [string]$program,
 
         [switch]$terminal,
@@ -70,7 +70,7 @@ function asdf() {
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
-        } elseif (("install", "global", "local", "uninstall", "env").contains($program)) {
+        } elseif (("install", "global", "local", "uninstall").contains($program)) {
 
             $paramname = "name"
             $position = 1
@@ -121,54 +121,33 @@ function asdf() {
 }
 
 $PromptScript = (Get-Command Prompt).ScriptBlock
-$EnvPathBacup = $env:PATH.Split(";") | Select-String -Pattern "asdf" -NotMatch | Join-String -Separator ";"
+$EnvPathBackup = $env:PATH.Split(";") | Select-String -Pattern "asdf" -NotMatch | Join-String -Separator ";"
 
 function Prompt {
 
-    $infos = @{}
-    $infosLocal = @{}
-    
-    Get-Content "$HOME\.win-tool-versions" |
-        ForEach-Object {
-            $pluginarray = $_.split(" ")
-            $p = $pluginarray[0]
-            $l = $pluginarray[1]
-            $infos[$p] = $l
-        }
+    $env:PATH = $EnvPathBackup
+
+    [System.Collections.ArrayList]$plugins = [AsdfUtils]::readByfile([AsdfStatics]::HOME)
+    $versionspath = ""
     $array = $PWD.ToString().split("\")
-    foreach ( $i in $array ) {
+    foreach ($i in $array) {
         $versionspath += $i + "\"
-        if (Test-Path "$versionspath.win-tool-versions") {
-            Get-Content "$versionspath.win-tool-versions" |
-                ForEach-Object {
-                    $pluginarray = $_.split(" ")
-                    $p = $pluginarray[0]
-                    $l = $pluginarray[1]
-                    $infos[$p] = $l
-                    $infosLocal[$p] = $l
+        $others = [AsdfUtils]::readByfile($versionspath)
+        if ($others) {
+            foreach ($o in $others) {
+                $p = $plugins | Where-Object { $_.plugin.name -eq $o.plugin.name }
+                if ($p) {
+                    $plugins.Remove($p)
                 }
+                $plugins += $o
+            }
         }
+    }
+    foreach ($v in $plugins) {
+        $env:PATH += ";$($v.pathInstalledExe())"
+        $v.configEnv("Shell")
     }
 
-    $env:PATH = $EnvPathBacup
-    foreach ($Key in $infos.Keys) {
-        if (Test-Path "$ASDF_HOME_PLUGINS\$Key") {
-            $pluginConfig = (Get-Content "$ASDF_HOME_PLUGINS\$Key\config.json" | ConvertFrom-Json)
-            $winPath = $pluginConfig.winPath
-            $envName = $pluginConfig.envName
-            [Environment]::SetEnvironmentVariable($envName, "$ASDF_HOME_INSTALLS\$Key\$($infos[$Key])")
-            $env:PATH += ";$ASDF_HOME_INSTALLS\$Key\$($infos[$Key])$winPath"
-            $infosToText += "$Key $($infos[$Key]) | "
-        }
-    }
-
-    if ((Get-Content "$HOME\.asdf-config" | ConvertFrom-Json).showPromptVersions -eq "true") {
-        $infosToText = ""
-        foreach ($Key in $infosLocal.Keys) {
-            $infosToText += "| $Key $($infos[$Key]) "
-        }
-        Write-Host -ForegroundColor DarkGreen $infosToText # -NoNewline
-    }
     .$PromptScript
 
 }

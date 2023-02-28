@@ -129,6 +129,11 @@ class AsdfPlugin {
         $this.name = $name
     }
 
+    [PSCustomObject] config() {
+        $config = (Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)\config.json" | ConvertFrom-Json)
+        return $config
+    }
+
     [void] add() {
         $origem = "$([AsdfStatics]::ASDF_HOME_LOCAL_REPO)\$($this.name)"
         $dest = "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)"
@@ -227,9 +232,17 @@ class AsdfVersion {
         Write-Output "$($this.plugin.name) $($this.name)" >> $dest
     }
 
+    [string] pathInstalled() {
+        return "$([AsdfStatics]::ASDF_HOME_INSTALLS)\$($this.plugin.name)\$($this.name)"
+    }
+
+    [string] pathInstalledExe() {
+        return "$($this.pathInstalled())$($this.plugin.config().winPath)"
+    }
+
     [void] configEnv([string]$scope) {
         $dest = "$([AsdfStatics]::ASDF_HOME_INSTALLS)\$($this.plugin.name)\$($this.name)"
-        $config = (Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\config.json" | ConvertFrom-Json)
+        $config = $this.plugin.config()
         if ($scope -eq "Shell") {
             [Environment]::SetEnvironmentVariable($config.envName, $dest)
         } else {

@@ -21,4 +21,3 @@ foreach($p in $plugins) {
     $info.path = $v.path
     Write-output $info
 }
-
