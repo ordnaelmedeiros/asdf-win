@@ -4,5 +4,6 @@ target/*
 installs/*
 downloads/*
 plugins/*
+repository/*
 log.txt
 update.log

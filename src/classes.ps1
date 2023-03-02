@@ -6,6 +6,7 @@ class AsdfStatics {
     static [string]$ASDF_HOME_DOWNLOADS
     static [string]$ASDF_HOME_PLUGINS
     static [string]$ASDF_HOME_LOCAL_REPO
+    static [string]$ASDF_HOME_REPO
 
 }
 
@@ -43,7 +44,7 @@ class AsdfUtils {
 class AsdfPluginManager {
 
     [AsdfPlugin[]] all() {
-        return $this.pluginByPath([AsdfStatics]::ASDF_HOME_LOCAL_REPO)
+        return $this.pluginByPath("$([AsdfStatics]::ASDF_HOME_REPO)\plugins")
     }
 
     [AsdfPlugin[]] installed() {
@@ -66,6 +67,19 @@ class AsdfPluginManager {
             return
         }
         $plugin.add()
+    }
+
+    [void] add($name, $url) {
+        if (!$name) {
+            Write-Warning "Plugin is required"
+            return 
+        }
+        $plugin = $this.all() | Where-Object { $_.name -eq $name }
+        if (!$plugin) {
+            Write-Warning "Plugin not found"
+            return
+        }
+        $plugin.add($url)
     }
 
     [void] remove($name) {
@@ -93,8 +107,21 @@ class AsdfPluginManager {
     }
 
     [void] update($name) {
-        $this.remove($name)
-        $this.add($name)
+        if (!$name) {
+            Write-Warning "Plugin is required"
+            return 
+        }
+        $plugin = $this.installed() | Where-Object { $_.name -eq $name }
+        if (!$plugin) {
+            Write-Warning "Plugin not installed"
+            return
+        }
+        $plugin = $this.all() | Where-Object { $_.name -eq $name }
+        if (!$plugin) {
+            Write-Warning "Plugin not found"
+            return
+        }
+        $plugin.update()
     }
 
     [AsdfPlugin[]] pluginByPath([string]$path) {
@@ -130,22 +157,33 @@ class AsdfPlugin {
     }
 
     [PSCustomObject] config() {
-        $config = (Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)\config.json" | ConvertFrom-Json)
+        $config = (Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)\win\config.json" | ConvertFrom-Json)
         return $config
     }
 
     [void] add() {
-        $origem = "$([AsdfStatics]::ASDF_HOME_LOCAL_REPO)\$($this.name)"
+        $content = Get-Content "$([AsdfStatics]::ASDF_HOME_REPO)\plugins\$($this.name)"
+        $properties = ConvertFrom-StringData($content)
+        $this.add($properties.repository)
+    }
+
+    [void] add($url) {
         $dest = "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)"
         New-Item -ItemType Directory -Path "$dest"
-        Copy-Item -Recurse -Path "$origem\*" -Destination "$dest"
+        git clone $url $dest
         [AsdfUtils]::trace("Plugin $($this.name) installed")
     }
 
     [void] remove() {
         $dest = "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)"
-        Remove-Item -Recurse -Path "$dest"
+        Remove-Item -Recurse -Force -Path "$dest"
         [AsdfUtils]::trace("Plugin $($this.name) removed")
+    }
+
+    [void] update() {
+        $dest = "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)"
+        Write-Warning "Plugin $($this.name) updating..."
+        git -C $dest pull
     }
 
     [AsdfVersion[]] installed() {
@@ -161,7 +199,7 @@ class AsdfPlugin {
 
     [AsdfVersion[]] all() {
         $list = @()
-        foreach($i in (Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)\versions.json" | ConvertFrom-Json)) {
+        foreach($i in (Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)\win\versions.json" | ConvertFrom-Json)) {
             $list += [AsdfVersion]::new($this, $i.Name)
         }
         return $list
@@ -243,10 +281,12 @@ class AsdfVersion {
     [void] configEnv([string]$scope) {
         $dest = "$([AsdfStatics]::ASDF_HOME_INSTALLS)\$($this.plugin.name)\$($this.name)"
         $config = $this.plugin.config()
-        if ($scope -eq "Shell") {
-            [Environment]::SetEnvironmentVariable($config.envName, $dest)
-        } else {
-            [Environment]::SetEnvironmentVariable($config.envName, $dest, $scope)
+        if ($config) {
+            if ($scope -eq "Shell") {
+                [Environment]::SetEnvironmentVariable($config.envName, $dest)
+            } else {
+                [Environment]::SetEnvironmentVariable($config.envName, $dest, $scope)
+            }
         }
     }
 
@@ -271,7 +311,7 @@ class AsdfVersion {
             return
         }
 
-        $config = Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\config.json" | ConvertFrom-Json
+        $config = Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\win\config.json" | ConvertFrom-Json
 
         $this.recreatePath($path_download)
         $this.recreatePath($path_install_tmp)
@@ -300,11 +340,11 @@ class AsdfVersion {
     }
 
     [string] getUrl() {
-        if (Test-Path "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\get-url.ps1") {
-            $url = ."$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\get-url.ps1"
+        if (Test-Path "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\win\get-url.ps1") {
+            $url = ."$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\win\get-url.ps1"
         } else {
             $url = (
-                    Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\versions.json"
+                    Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\win\versions.json"
                         | ConvertFrom-Json
                         | Where-Object { $_.name -eq $this.name }
                 ).url

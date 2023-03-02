@@ -7,7 +7,11 @@ if ($command -eq "list") {
         $pluginManager.installed().name
     }
 } elseif ($command -eq "add") {
-    $pluginManager.add($name)
+    if ($url) {
+        $pluginManager.add($name, $url)
+    } else {
+        $pluginManager.add($name)
+    }
 } elseif ($command -eq "remove") {
     $pluginManager.remove($name)
 } elseif ($command -eq "update") {
