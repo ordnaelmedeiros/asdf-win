@@ -9,6 +9,10 @@ $ASDF_HOME_DOWNLOADS = "${ASDF_HOME}\downloads"
 
 ."$ASDF_HOME_SCRIPTS\import.ps1"
 
+if (-not (Test-Path "$ASDF_HOME_REPO\README.md")) {
+    Remove-Item -Recurse -Force -Path "$ASDF_HOME_REPO"
+    Remove-Item -Recurse -Force -Path "$ASDF_HOME_PLUGINS"
+}
 if (-not (Test-Path "$ASDF_HOME_REPO")) {
     git clone "https://github.com/ordnaelmedeiros/asdf-win-plugins" "$ASDF_HOME_REPO"
 }

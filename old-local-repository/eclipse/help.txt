@@ -1,9 +1,0 @@
-
-create windows link:
-asdf global eclipse <version>
-
-open in terminal:
-$ eclipse
-
-open in workspace:
-$ eclipse -data <workspace-path>
