@@ -31,9 +31,11 @@ class AsdfUtils {
             foreach($line in (Get-Content "$path")) {
                 $itens = $line.split(" ")
                 $plugin = $pluginManager.plugin($itens[0])
-                $version = [AsdfVersion]::new($plugin, $itens[1])
-                $version.path = $path
-                $versions += $version
+                if ($plugin.name.length -ge 1) {
+                    $version = [AsdfVersion]::new($plugin, $itens[1])
+                    $version.path = $path
+                    $versions += $version
+                }
             }
         }
         return $versions
@@ -74,11 +76,7 @@ class AsdfPluginManager {
             Write-Warning "Plugin is required"
             return 
         }
-        $plugin = $this.all() | Where-Object { $_.name -eq $name }
-        if (!$plugin) {
-            Write-Warning "Plugin not found"
-            return
-        }
+        $plugin = [AsdfPlugin]::new($name)
         $plugin.add($url)
     }
 
@@ -116,11 +114,6 @@ class AsdfPluginManager {
             Write-Warning "Plugin not installed"
             return
         }
-        $plugin = $this.all() | Where-Object { $_.name -eq $name }
-        if (!$plugin) {
-            Write-Warning "Plugin not found"
-            return
-        }
         $plugin.update()
     }
 
@@ -135,9 +128,11 @@ class AsdfPluginManager {
     }
 
     [AsdfPlugin] plugin([string]$name) {
-        $item = $this.all() | Where-Object { $_.name -eq $name }
+        $item = $this.installed() | Where-Object { $_.name -eq $name }
         if (!$item) {
-            throw "Plugin ${name} not found"
+            # throw "Plugin ${name} not found"
+            Write-Warning "Plugin ${name} not found"
+            return [AsdfPlugin]::new($name)
         }
         return $item
     }

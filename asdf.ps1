@@ -13,7 +13,7 @@ if (-not (Test-Path "$ASDF_HOME_REPO")) {
     git clone "https://github.com/ordnaelmedeiros/asdf-win-plugins" "$ASDF_HOME_REPO"
 }
 
-$PLUGINS_NAMES = (Get-Item "$ASDF_HOME_REPO\plugins\*").Name
+# $PLUGINS_NAMES = (Get-Item "$ASDF_HOME_REPO\plugins\*").Name
 
 function Create-Param-Asdf() {
     $ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
@@ -58,7 +58,8 @@ function asdf() {
 
             $paramname = "name"
             $position = 2
-            $validateSet = @("all") + $PLUGINS_NAMES
+            # $validateSet = @("all") + $PLUGINS_NAMES
+            $validateSet = @()
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
         
@@ -72,7 +73,8 @@ function asdf() {
 
             $paramname = "name"
             $position = 1
-            $validateSet = $PLUGINS_NAMES
+            # $validateSet = $PLUGINS_NAMES
+            $validateSet = @()
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
@@ -80,7 +82,8 @@ function asdf() {
 
             $paramname = "name"
             $position = 1
-            $validateSet = $PLUGINS_NAMES
+            # $validateSet = $PLUGINS_NAMES
+            $validateSet = @()
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
@@ -94,7 +97,8 @@ function asdf() {
 
             $paramname = "name"
             $position = 1
-            $validateSet = $PLUGINS_NAMES
+            # $validateSet = $PLUGINS_NAMES
+            $validateSet = @()
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
