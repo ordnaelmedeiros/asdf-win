@@ -3,19 +3,23 @@ $ASDF_HOME_SRC = "${HOME}\.asdf\src"
 $ASDF_HOME_SCRIPTS = "${ASDF_HOME}\scripts"
 $ASDF_HOME_PLUGINS = "${ASDF_HOME}\plugins"
 $ASDF_HOME_LOCAL_REPO = "${ASDF_HOME}\local-repository"
+$ASDF_HOME_REPO = "${ASDF_HOME}\repository"
 $ASDF_HOME_INSTALLS = "${ASDF_HOME}\installs"
 $ASDF_HOME_DOWNLOADS = "${ASDF_HOME}\downloads"
 
-$PLUGINS_NAMES = (Get-Item $ASDF_HOME_LOCAL_REPO\*).Name
-
 ."$ASDF_HOME_SCRIPTS\import.ps1"
 
+if (-not (Test-Path "$ASDF_HOME_REPO\README.md")) {
+    Remove-Item -Recurse -Force -Path "$ASDF_HOME_REPO"
+    Remove-Item -Recurse -Force -Path "$ASDF_HOME_PLUGINS"
+}
+if (-not (Test-Path "$ASDF_HOME_REPO")) {
+    git clone "https://github.com/ordnaelmedeiros/asdf-win-plugins" "$ASDF_HOME_REPO"
+}
+
+# $PLUGINS_NAMES = (Get-Item "$ASDF_HOME_REPO\plugins\*").Name
+
 function Create-Param-Asdf() {
-
-    # echo "paramname: $paramname" >> "$ASDF_HOME\log.txt"
-    # echo "position: $position" >> "$ASDF_HOME\log.txt"
-    # echo "validateSet: $validateSet" >> "$ASDF_HOME\log.txt"
-
     $ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
     $ParameterAttribute.Position = $position
     $AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
@@ -58,15 +62,23 @@ function asdf() {
 
             $paramname = "name"
             $position = 2
-            $validateSet = @("all") + $PLUGINS_NAMES
+            # $validateSet = @("all") + $PLUGINS_NAMES
+            $validateSet = @()
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
         
+            $paramname = "url"
+            $position = 3
+            $validateSet = @()
+            $p = Create-Param-Asdf
+            $paramDictionary.Add("$paramname", $p)
+
         } elseif (("current", "help").contains($program)) {
 
             $paramname = "name"
             $position = 1
-            $validateSet = $PLUGINS_NAMES
+            # $validateSet = $PLUGINS_NAMES
+            $validateSet = @()
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
@@ -74,7 +86,8 @@ function asdf() {
 
             $paramname = "name"
             $position = 1
-            $validateSet = $PLUGINS_NAMES
+            # $validateSet = $PLUGINS_NAMES
+            $validateSet = @()
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
@@ -88,7 +101,8 @@ function asdf() {
 
             $paramname = "name"
             $position = 1
-            $validateSet = $PLUGINS_NAMES
+            # $validateSet = $PLUGINS_NAMES
+            $validateSet = @()
             $p = Create-Param-Asdf
             $paramDictionary.Add("$paramname", $p)
 
@@ -108,6 +122,7 @@ function asdf() {
         $name = $PSBoundParameters['name']
         $version = $PSBoundParameters['version']
         $filter = $PSBoundParameters['filter']
+        $url = $PSBoundParameters['url']
     }
     Process {
         if ($program) {
@@ -125,27 +140,34 @@ $EnvPathBackup = $env:PATH.Split(";") | Select-String -Pattern "asdf" -NotMatch 
 
 function Prompt {
 
-    $env:PATH = $EnvPathBackup
+    try {
 
-    [System.Collections.ArrayList]$plugins = [AsdfUtils]::readByfile([AsdfStatics]::HOME)
-    $versionspath = ""
-    $array = $PWD.ToString().split("\")
-    foreach ($i in $array) {
-        $versionspath += $i + "\"
-        $others = [AsdfUtils]::readByfile($versionspath)
-        if ($others) {
-            foreach ($o in $others) {
-                $p = $plugins | Where-Object { $_.plugin.name -eq $o.plugin.name }
-                if ($p) {
-                    $plugins.Remove($p)
+        $env:PATH = $EnvPathBackup
+
+        [System.Collections.ArrayList]$plugins = [AsdfUtils]::readByfile([AsdfStatics]::HOME)
+        $versionspath = ""
+        $array = $PWD.ToString().split("\")
+        foreach ($i in $array) {
+            $versionspath += $i + "\"
+            $others = [AsdfUtils]::readByfile($versionspath)
+            if ($others) {
+                foreach ($o in $others) {
+                    $p = $plugins | Where-Object { $_.plugin.name -eq $o.plugin.name }
+                    if ($p) {
+                        $plugins.Remove($p)
+                    }
+                    $plugins += $o
                 }
-                $plugins += $o
             }
         }
-    }
-    foreach ($v in $plugins) {
-        $env:PATH += ";$($v.pathInstalledExe())"
-        $v.configEnv("Shell")
+        
+        foreach ($v in $plugins) {
+            $env:PATH += ";$($v.pathInstalledExe())"
+            $v.configEnv("Shell")
+        }
+
+    } catch {
+        Write-Host "$_"
     }
 
     .$PromptScript
