@@ -10,6 +10,7 @@ $ASDF_HOME_DOWNLOADS = "${ASDF_HOME}\downloads"
 ."$ASDF_HOME_SCRIPTS\import.ps1"
 
 if (-not (Test-Path "$ASDF_HOME_REPO\README.md")) {
+    $TMP_PLUGINS_NAMES = (Get-Item "$ASDF_HOME_REPO\plugins\*").Name
     Remove-Item -Recurse -Force -Path "$ASDF_HOME_REPO"
     Remove-Item -Recurse -Force -Path "$ASDF_HOME_PLUGINS"
 }
@@ -132,6 +133,12 @@ function asdf() {
             Get-Content "$ASDF_HOME\banner.txt"
             Get-Content "$ASDF_HOME\version.txt"
         }
+    }
+}
+
+if ($TMP_PLUGINS_NAMES) {
+    foreach ($p in $TMP_PLUGINS_NAMES) {
+        asdf plugin add $p
     }
 }
 
