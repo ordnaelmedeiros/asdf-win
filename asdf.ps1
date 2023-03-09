@@ -142,8 +142,6 @@ function Prompt {
 
     try {
 
-        $env:PATH = $EnvPathBackup
-
         [System.Collections.ArrayList]$plugins = [AsdfUtils]::readByfile([AsdfStatics]::HOME)
         $versionspath = ""
         $array = $PWD.ToString().split("\")
@@ -161,10 +159,12 @@ function Prompt {
             }
         }
         
+        $pathTmp = ""
         foreach ($v in $plugins) {
-            $env:PATH += ";$($v.pathInstalledExe())"
+            $pathTmp += "$($v.pathInstalledExe());"
             $v.configEnv("Shell")
         }
+        $env:PATH = $pathTmp + $EnvPathBackup
 
     } catch {
         Write-Host "$_"

@@ -194,8 +194,13 @@ class AsdfPlugin {
 
     [AsdfVersion[]] all() {
         $list = @()
-        foreach($i in (Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)\win\versions.json" | ConvertFrom-Json)) {
-            $list += [AsdfVersion]::new($this, $i.Name)
+        if (Test-Path "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)\win\versions.json") {
+            foreach($i in (Get-Content "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)\win\versions.json" | ConvertFrom-Json)) {
+                $list += [AsdfVersion]::new($this, $i.Name)
+            }
+        }
+        if (Test-Path "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)\win\list-all.ps1") {
+            $list += ."$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.name)\win\list-all.ps1"
         }
         return $list
     }
