@@ -248,9 +248,19 @@ class AsdfVersion {
     }
 
     [void] global() {
+
         $dest = "$([AsdfStatics]::HOME)\.win-tool-versions"
         $this.writeToolFile($dest)
         $this.configEnv("User")
+
+        $EnvPathBackup = $env:PATH.Split(";") | Select-String -Pattern "asdf" -NotMatch | Join-String -Separator ";"
+        $EnvPathTmp = ""
+        $globalVersions = [AsdfUtils]::readByfile([AsdfStatics]::HOME)
+        foreach($v in $globalVersions) {
+            $EnvPathTmp += "$($v.pathInstalledExe());"
+        }
+        [Environment]::SetEnvironmentVariable("Path", $EnvPathTmp+$EnvPathBackup, "User")
+
     }
 
     [void] local() {
