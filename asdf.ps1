@@ -9,7 +9,7 @@ $ASDF_HOME_DOWNLOADS = "${ASDF_HOME}\downloads"
 
 ."$ASDF_HOME_SCRIPTS\import.ps1"
 
-if (-not (Test-Path "$ASDF_HOME_REPO\README.md")) {
+if ((Test-Path "$ASDF_HOME_REPO") -and -not (Test-Path "$ASDF_HOME_REPO\README.md")) {
     $TMP_PLUGINS_NAMES = (Get-Item "$ASDF_HOME_REPO\*").Name
     Remove-Item -Recurse -Force -Path "$ASDF_HOME_REPO"
     Remove-Item -Recurse -Force -Path "$ASDF_HOME_PLUGINS"
