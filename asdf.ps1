@@ -147,6 +147,8 @@ $EnvPathBackup = $env:PATH.Split(";") | Select-String -Pattern "asdf" -NotMatch 
 
 function Prompt {
 
+    $env:ASDF_CURRENT_PLUGINS = ""
+
     try {
 
         [System.Collections.ArrayList]$plugins = [AsdfUtils]::readByfile([AsdfStatics]::HOME)
@@ -168,6 +170,10 @@ function Prompt {
         
         $pathTmp = ""
         foreach ($v in $plugins) {
+            if ($env:ASDF_CURRENT_PLUGINS) {
+                $env:ASDF_CURRENT_PLUGINS += "|"
+            }
+            $env:ASDF_CURRENT_PLUGINS += "$($v.plugin.name) $($v.name)"
             $pathTmp += "$($v.pathInstalledExe());"
             $v.configEnv("Shell")
         }
