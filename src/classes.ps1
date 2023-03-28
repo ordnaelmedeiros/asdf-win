@@ -341,8 +341,8 @@ class AsdfVersion {
         } else {
             Copy-Item -Path "$path_download\file" -Destination "$path_install\file.$($config.fileType)"
         }
-        if (Test-Path "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\install.ps1") {
-            ."$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\install.ps1"
+        if (Test-Path "$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\win\install.ps1") {
+            ."$([AsdfStatics]::ASDF_HOME_PLUGINS)\$($this.plugin.name)\win\install.ps1"
         }
         Remove-Item -Recurse -Path $path_install_tmp
         Write-Warning "$($this.plugin.name) $($this.name) installed"
